@@ -6,9 +6,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}AlertaU - Universidad Nacional de San Martín{% endblock %}</title>
 
-  <!-- Favicon Institucional -->
+  <!-- Favicon Institucional (Logo UNSM) -->
+  <link rel="icon" type="image/png" href="{% static 'img/logo_unsm.png' %}">
   <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
-  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+  <link rel="apple-touch-icon" href="{% static 'img/logo_unsm.png' %}">
 
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -35,10 +36,9 @@
         <div class="d-flex align-items-center">
           <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'inicio' %}{% endif %}" class="d-flex align-items-center text-decoration-none">
             
-            <!-- Espacio reservado para Logo oficial de la UNSM -->
-            <div class="unsm-logo-box me-2" title="Espacio oficial para Logo UNSM">
-              <img src="{% static 'img/logo_unsm.png' %}" alt="Logo UNSM" class="unsm-logo-img" onerror="this.style.display='none'; document.getElementById('placeholder-unsm-nav').style.display='inline-flex';">
-              <span id="placeholder-unsm-nav" class="unsm-logo-placeholder" style="display: none;">Logo UNSM</span>
+            <!-- Logo oficial de la UNSM -->
+            <div class="unsm-logo-box me-2" title="Universidad Nacional de San Martín">
+              <img src="{% static 'img/logo_unsm.png' %}" alt="Logo UNSM" class="unsm-logo-img">
             </div>
 
             <div class="border-start ps-2 ms-1 border-secondary-subtle">
@@ -183,7 +183,7 @@
         </div>
         <div class="col-md-6 text-center text-md-end">
           <div class="d-inline-flex align-items-center gap-2">
-            <span class="unsm-logo-placeholder" style="font-size: 0.7rem;">Logo UNSM</span>
+            <img src="{% static 'img/logo_unsm.png' %}" alt="Logo UNSM" style="height: 24px; max-width: 100px; object-fit: contain;">
             <span class="text-muted" style="font-size: 0.8rem;">Uso académico y preventivo no sancionador</span>
           </div>
         </div>
