@@ -1,0 +1,100 @@
+{% extends 'alertau/base.html' %}
+{% load static %}
+
+{% block title %}Carga Masiva de Datos - AlertaU | UNSM{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Migajas de Pan -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-success">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Carga Masiva de Datos</li>
+    </ol>
+  </nav>
+
+  <!-- Encabezado -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+      <h1 class="h3 fw-bold text-dark mb-1">Carga Masiva e Inferencia en Lote</h1>
+      <p class="text-muted small mb-0">
+        Importe archivos estructurados en formato CSV para procesar múltiples estudiantes de forma simultánea.
+      </p>
+    </div>
+
+    <div class="mt-3 mt-md-0">
+      <a href="{% url 'descargar_plantilla' %}" class="btn btn-unsm-outline btn-sm">
+        <i class="bi bi-download me-1"></i> Descargar Plantilla CSV
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    
+    <!-- Formulario de Subida -->
+    <div class="col-lg-7">
+      <div class="card-clean p-4">
+        <div class="form-section-title">
+          <i class="bi bi-file-earmark-arrow-up text-success"></i> 1. Seleccionar Archivo Académico
+        </div>
+
+        <form method="post" enctype="multipart/form-data" action="{% url 'carga_masiva' %}">
+          {% csrf_token %}
+
+          <div class="mb-4">
+            <label for="archivo_csv" class="form-label">
+              Archivo CSV con Variables de Inferencia (.csv) <span class="text-danger">*</span>
+            </label>
+            <input class="form-control" type="file" id="archivo_csv" name="archivo_csv" accept=".csv" required>
+            <div class="form-text">
+              El archivo debe contener las cabeceras estándar definidas en el contrato del modelo ST-LR.
+            </div>
+          </div>
+
+          <div class="p-3 rounded bg-light border mb-4 small text-secondary">
+            <div class="fw-semibold text-dark mb-1"><i class="bi bi-shield-check text-success me-1"></i>Validación Automática:</div>
+            El sistema comprobará el orden de columnas, imputará registros con el preprocesador oficial y aplicará el umbral de decisión (30.0%) para cada fila.
+          </div>
+
+          <button type="submit" class="btn btn-unsm w-100 py-2">
+            <i class="bi bi-cpu me-2"></i>Procesar Lote e Inferir Riesgo
+          </button>
+        </form>
+
+      </div>
+    </div>
+
+    <!-- Instrucciones y Guía de Formato -->
+    <div class="col-lg-5">
+      <div class="card-clean p-4">
+        <div class="form-section-title">
+          <i class="bi bi-info-circle text-success"></i> 2. Estructura Requerida del CSV
+        </div>
+
+        <p class="text-muted small mb-3">
+          Para garantizar la compatibilidad con el pipeline de scikit-learn, el archivo debe incluir:
+        </p>
+
+        <ul class="list-unstyled space-y-2 small text-secondary">
+          <li class="mb-2"><i class="bi bi-check2 text-success me-1"></i> <strong>codigo_estudiante</strong>: Código institucional único.</li>
+          <li class="mb-2"><i class="bi bi-check2 text-success me-1"></i> <strong>nombre_referencial</strong>: Nombre o código anónimo.</li>
+          <li class="mb-2"><i class="bi bi-check2 text-success me-1"></i> <strong>periodo_corte</strong>: Semestre académico (ej. 2025-I).</li>
+          <li class="mb-2"><i class="bi bi-check2 text-success me-1"></i> <strong>20 variables numéricas</strong>: cursos, aprobados, gpa, créditos, repetidas y pendientes.</li>
+        </ul>
+
+        <div class="p-3 rounded border text-center" style="background-color: var(--unsm-green-subtle);">
+          <div class="fw-semibold text-dark small mb-1">¿No dispone de la estructura exacta?</div>
+          <p class="text-muted small mb-2">Descargue la plantilla prediseñada con ejemplos listos para rellenar.</p>
+          <a href="{% url 'descargar_plantilla' %}" class="btn btn-unsm-soft btn-sm">
+            <i class="bi bi-file-earmark-spreadsheet me-1"></i>Descargar plantilla_carga_alertau.csv
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

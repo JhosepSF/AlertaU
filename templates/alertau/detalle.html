@@ -1,0 +1,255 @@
+{% extends 'alertau/base.html' %}
+{% load static %}
+
+{% block title %}Detalle de Evaluación #{{ prediccion.id }} - AlertaU | UNSM{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Migajas de Pan -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-success">Dashboard</a></li>
+      <li class="breadcrumb-item"><a href="{% url 'historial' %}" class="text-decoration-none text-success">Historial</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Detalle de Evaluación</li>
+    </ol>
+  </nav>
+
+  <!-- Encabezado -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+      <div class="d-flex align-items-center gap-2">
+        <h1 class="h3 fw-bold text-dark mb-0">Detalle Completo de Factores Académicos</h1>
+        <span class="badge bg-light text-secondary border">Registro #{{ prediccion.id }}</span>
+      </div>
+      <p class="text-muted small mb-0">
+        Ficha técnica auditada de las 20 variables procesadas por el modelo ST-LR en la UNSM
+      </p>
+    </div>
+
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <a href="{% url 'historial' %}" class="btn btn-outline-secondary btn-sm">
+        <i class="bi bi-arrow-left me-1"></i> Volver al Historial
+      </a>
+      <a href="{% url 'resultado_prediccion' prediccion.pk %}" class="btn btn-unsm btn-sm">
+        <i class="bi bi-card-checklist me-1"></i> Ver Ficha Diagnóstica
+      </a>
+    </div>
+  </div>
+
+  <!-- Ficha General del Estudiante -->
+  <div class="card-clean p-4 mb-4">
+    <div class="row g-3 align-items-center">
+      <div class="col-md-3">
+        <span class="text-muted small d-block">Código del Estudiante:</span>
+        <span class="h5 fw-bold text-dark mb-0 font-monospace">{{ prediccion.codigo_estudiante }}</span>
+      </div>
+      <div class="col-md-3">
+        <span class="text-muted small d-block">Nombre / Referencia:</span>
+        <span class="fw-semibold text-dark">{{ prediccion.nombre_referencial|default:"Confidencial" }}</span>
+      </div>
+      <div class="col-md-2">
+        <span class="text-muted small d-block">Periodo de Corte:</span>
+        <span class="badge bg-light text-secondary border fs-6">{{ prediccion.periodo_corte }}</span>
+      </div>
+      <div class="col-md-2">
+        <span class="text-muted small d-block">Diagnóstico:</span>
+        <span class="risk-badge {{ prediccion.badge_class_custom }}">
+          {{ prediccion.get_nivel_riesgo_display }}
+        </span>
+      </div>
+      <div class="col-md-2">
+        <span class="text-muted small d-block">Probabilidad:</span>
+        <span class="h5 fw-bold text-dark mb-0">{{ prediccion.probabilidad_porcentaje }}%</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabla Detallada de las 20 Variables -->
+  <div class="card-clean mb-4">
+    <div class="card-header-clean d-flex justify-content-between align-items-center">
+      <span class="fw-bold text-dark"><i class="bi bi-table me-2 text-success"></i>Auditoría de Factores (Contrato de Inferencia)</span>
+      <span class="badge bg-light text-success border border-success-subtle">20 Predictores</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-clean mb-0 align-middle">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Variable del Modelo</th>
+            <th>Nombre Técnico</th>
+            <th>Periodo</th>
+            <th>Valor Registrado</th>
+            <th>Interpretación Contextual</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td class="fw-semibold">Cursos matriculados t0</td>
+            <td><code>cursos_t0</code></td>
+            <td><span class="badge bg-light text-secondary border">t0</span></td>
+            <td><strong>{{ factores.cursos_t0|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Cursos cursados en el periodo inmediatamente previo al corte</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td class="fw-semibold">Cursos matriculados t1</td>
+            <td><code>cursos_t1</code></td>
+            <td><span class="badge bg-light text-success border border-success-subtle">t1</span></td>
+            <td><strong>{{ factores.cursos_t1|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Cursos cursados en el periodo actual de corte evaluado</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td class="fw-semibold">Cursos aprobados t0</td>
+            <td><code>aprobados_t0</code></td>
+            <td><span class="badge bg-light text-secondary border">t0</span></td>
+            <td><strong class="text-success">{{ factores.aprobados_t0|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Asignaturas superadas en el periodo previo</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td class="fw-semibold">Cursos aprobados t1</td>
+            <td><code>aprobados_t1</code></td>
+            <td><span class="badge bg-light text-success border border-success-subtle">t1</span></td>
+            <td><strong class="text-success">{{ factores.aprobados_t1|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Asignaturas superadas en el periodo de corte</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td class="fw-semibold">Cursos desaprobados t0</td>
+            <td><code>desaprobados_t0</code></td>
+            <td><span class="badge bg-light text-secondary border">t0</span></td>
+            <td><strong class="text-danger">{{ factores.desaprobados_t0|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Asignaturas no aprobadas en periodo previo</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td class="fw-semibold">Cursos desaprobados t1</td>
+            <td><code>desaprobados_t1</code></td>
+            <td><span class="badge bg-light text-success border border-success-subtle">t1</span></td>
+            <td><strong class="text-danger">{{ factores.desaprobados_t1|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Asignaturas no aprobadas en periodo de corte</td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td class="fw-semibold">Cursos retirados t0</td>
+            <td><code>retirados_t0</code></td>
+            <td><span class="badge bg-light text-secondary border">t0</span></td>
+            <td><strong>{{ factores.retirados_t0|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Asignaturas dadas de baja en periodo anterior</td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td class="fw-semibold">Media simple t0</td>
+            <td><code>media_simple_t0</code></td>
+            <td><span class="badge bg-light text-secondary border">t0</span></td>
+            <td><strong>{{ factores.media_simple_t0|floatformat:2 }}</strong></td>
+            <td class="text-muted small">Promedio aritmético directo de asignaturas t0</td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td class="fw-semibold">Media simple t1</td>
+            <td><code>media_simple_t1</code></td>
+            <td><span class="badge bg-light text-success border border-success-subtle">t1</span></td>
+            <td><strong>{{ factores.media_simple_t1|floatformat:2 }}</strong></td>
+            <td class="text-muted small">Promedio aritmético directo de asignaturas t1</td>
+          </tr>
+          <tr>
+            <td>10</td>
+            <td class="fw-semibold">GPA semestral t0</td>
+            <td><code>gpa_t0</code></td>
+            <td><span class="badge bg-light text-secondary border">t0</span></td>
+            <td><strong>{{ factores.gpa_t0|floatformat:2 }}</strong></td>
+            <td class="text-muted small">Promedio ponderado por créditos en periodo t0</td>
+          </tr>
+          <tr>
+            <td>11</td>
+            <td class="fw-semibold">GPA semestral t1</td>
+            <td><code>gpa_t1</code></td>
+            <td><span class="badge bg-light text-success border border-success-subtle">t1</span></td>
+            <td><strong>{{ factores.gpa_t1|floatformat:2 }}</strong></td>
+            <td class="text-muted small">Promedio ponderado por créditos en periodo t1</td>
+          </tr>
+          <tr>
+            <td>12</td>
+            <td class="fw-semibold">GPA acumulado t0</td>
+            <td><code>gpa_acumulado_t0</code></td>
+            <td><span class="badge bg-light text-secondary border">t0</span></td>
+            <td><strong>{{ factores.gpa_acumulado_t0|floatformat:2 }}</strong></td>
+            <td class="text-muted small">Promedio ponderado global acumulado hasta t0</td>
+          </tr>
+          <tr>
+            <td>13</td>
+            <td class="fw-semibold">GPA acumulado t1</td>
+            <td><code>gpa_acumulado_t1</code></td>
+            <td><span class="badge bg-light text-success border border-success-subtle">t1</span></td>
+            <td><strong>{{ factores.gpa_acumulado_t1|floatformat:2 }}</strong></td>
+            <td class="text-muted small">Promedio ponderado global acumulado hasta t1</td>
+          </tr>
+          <tr>
+            <td>14</td>
+            <td class="fw-semibold">Créditos aprobados t0</td>
+            <td><code>creditos_aprobados_t0</code></td>
+            <td><span class="badge bg-light text-secondary border">t0</span></td>
+            <td><strong>{{ factores.creditos_aprobados_t0|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Créditos universitarios superados en t0</td>
+          </tr>
+          <tr>
+            <td>15</td>
+            <td class="fw-semibold">Créditos aprobados t1</td>
+            <td><code>creditos_aprobados_t1</code></td>
+            <td><span class="badge bg-light text-success border border-success-subtle">t1</span></td>
+            <td><strong>{{ factores.creditos_aprobados_t1|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Créditos universitarios superados en t1</td>
+          </tr>
+          <tr>
+            <td>16</td>
+            <td class="fw-semibold">Créditos totales t0</td>
+            <td><code>creditos_totales_t0</code></td>
+            <td><span class="badge bg-light text-secondary border">t0</span></td>
+            <td><strong>{{ factores.creditos_totales_t0|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Carga académica en créditos matriculada en t0</td>
+          </tr>
+          <tr>
+            <td>17</td>
+            <td class="fw-semibold">Créditos totales t1</td>
+            <td><code>creditos_totales_t1</code></td>
+            <td><span class="badge bg-light text-success border border-success-subtle">t1</span></td>
+            <td><strong>{{ factores.creditos_totales_t1|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Carga académica en créditos matriculada en t1</td>
+          </tr>
+          <tr class="table-warning">
+            <td>18</td>
+            <td class="fw-semibold text-danger">Matrículas repetidas en t1</td>
+            <td><code>matriculas_repetidas_t1</code></td>
+            <td><span class="badge bg-light text-success border border-success-subtle">t1</span></td>
+            <td><strong class="text-danger">{{ factores.matriculas_repetidas_t1|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Asignaturas llevadas por 2da o 3ra oportunidad en t1</td>
+          </tr>
+          <tr>
+            <td>19</td>
+            <td class="fw-semibold">Desaprobaciones en historial</td>
+            <td><code>desaprobaciones_historial</code></td>
+            <td><span class="badge bg-light text-dark border">Historial</span></td>
+            <td><strong>{{ factores.desaprobaciones_historial|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Total acumulado de cursos desaprobados en la carrera</td>
+          </tr>
+          <tr class="table-danger">
+            <td>20</td>
+            <td class="fw-semibold text-danger">Cursos pendientes al corte</td>
+            <td><code>n_cursos_pendientes_al_corte</code></td>
+            <td><span class="badge bg-light text-dark border">Al Corte</span></td>
+            <td><strong class="text-danger">{{ factores.n_cursos_pendientes_al_corte|floatformat:0 }}</strong></td>
+            <td class="text-muted small">Asignaturas desaprobadas aún no subsanadas al cierre de t1</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

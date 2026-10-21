@@ -1,0 +1,174 @@
+{% extends 'alertau/base.html' %}
+{% load static %}
+
+{% block title %}AlertaU - Sistema de Predicción de Riesgo Académico | UNSM{% endblock %}
+
+{% block content %}
+<!-- Hero Section Institucional -->
+<section class="py-5" style="background: linear-gradient(180deg, var(--unsm-green-bg) 0%, rgba(255,255,255,1) 100%); border-bottom: 1px solid var(--color-gray-200);">
+  <div class="container py-4">
+    <div class="row align-items-center gy-5">
+      
+      <div class="col-lg-7">
+        <!-- Espacio Identidad Institucional UNSM -->
+        <div class="d-inline-flex align-items-center gap-2 mb-3 bg-white px-3 py-1 rounded-pill border shadow-sm">
+          <div class="unsm-logo-box border-0 p-0">
+            <img src="{% static 'img/logo_unsm.png' %}" alt="Logo UNSM" style="height: 28px;" onerror="this.style.display='none'; document.getElementById('placeholder-unsm-hero').style.display='inline-flex';">
+            <span id="placeholder-unsm-hero" class="unsm-logo-placeholder py-1 px-2" style="display: none; font-size: 0.7rem;">Logo UNSM</span>
+          </div>
+          <span class="text-secondary small fw-semibold">Universidad Nacional de San Martín</span>
+        </div>
+
+        <h1 class="display-5 fw-bold text-dark mb-3" style="letter-spacing: -0.03em;">
+          Alerta<span style="color: var(--unsm-green-primary);">U</span>
+        </h1>
+        <h2 class="h4 text-secondary fw-normal mb-4" style="line-height: 1.4;">
+          Sistema inteligente para la predicción del riesgo de desaprobación recurrente
+        </h2>
+        
+        <p class="lead text-muted fs-6 mb-4" style="max-width: 580px;">
+          Plataforma analítica diseñada para el seguimiento académico temprano en la UNSM. 
+          A través de algoritmos semisupervisados, el sistema identifica oportunamente a estudiantes 
+          en riesgo de persistencia en pérdida de asignaturas para activar tutorías preventivas y apoyo pedagógico oportuno.
+        </p>
+
+        <!-- Botones de Acción -->
+        <div class="d-flex flex-wrap align-items-center gap-3">
+          {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="btn btn-unsm px-4 py-2">
+              <i class="bi bi-speedometer2 me-2"></i>Ir al sistema
+            </a>
+            <a href="{% url 'prediccion_individual' %}" class="btn btn-unsm-outline px-4 py-2">
+              <i class="bi bi-cpu me-2"></i>Nueva evaluación
+            </a>
+          {% else %}
+            <a href="{% url 'login' %}" class="btn btn-unsm px-4 py-2">
+              <i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión
+            </a>
+            <a href="#informacion" class="btn btn-unsm-outline px-4 py-2">
+              <i class="bi bi-info-circle me-2"></i>Ver información
+            </a>
+          {% endif %}
+        </div>
+
+        <!-- Indicador de Ética Institucional -->
+        <div class="d-flex align-items-center gap-2 mt-4 text-muted small">
+          <i class="bi bi-shield-check text-success"></i>
+          <span>Uso estrictamente formativo y de orientación académica, no sancionador.</span>
+        </div>
+
+      </div>
+
+      <!-- Tarjeta Resumen Visual / Banner Hero -->
+      <div class="col-lg-5">
+        <div class="card-clean p-4 shadow-sm bg-white">
+          <div class="d-flex align-items-center justify-content-between pb-3 mb-3 border-bottom">
+            <div>
+              <span class="badge bg-light text-success border border-success-subtle px-2 py-1">Modelo Predictivo Activo</span>
+              <h5 class="fw-bold mb-0 mt-2 text-dark">ST-LR Semisupervisado</h5>
+            </div>
+            <div class="text-end">
+              <span class="unsm-logo-placeholder">Logo UNSM</span>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div class="p-3 rounded-3 mb-2" style="background-color: var(--unsm-green-bg); border-left: 4px solid var(--unsm-green-primary);">
+              <div class="fw-semibold text-dark small mb-1"><i class="bi bi-bullseye me-1 text-success"></i> Umbral Institucional Calibrado</div>
+              <div class="text-muted small">Alerta fijada al <strong>30.0%</strong> de probabilidad estimada, optimizada para intervención temprana sin falsos negativos en población vulnerable.</div>
+            </div>
+
+            <div class="p-3 rounded-3 mb-2 bg-light border">
+              <div class="fw-semibold text-dark small mb-1"><i class="bi bi-clock-history me-1 text-primary"></i> Horizonte de Seguimiento</div>
+              <div class="text-muted small">Pronóstico enfocado en los <strong>dos semestres académicos</strong> posteriores al semestre de corte evaluado.</div>
+            </div>
+
+            <div class="p-3 rounded-3 bg-light border">
+              <div class="fw-semibold text-dark small mb-1"><i class="bi bi-people me-1 text-info"></i> Población Objetivo</div>
+              <div class="text-muted small">Estudiantes regulares con antecedentes de asignaturas previamente desaprobadas aún pendientes.</div>
+            </div>
+          </div>
+
+          <div class="mt-4 pt-3 border-top text-center">
+            <span class="text-secondary small">Evaluaciones registradas: <strong>{{ total_evaluaciones }}</strong></span>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Sección Informativa -->
+<section id="informacion" class="py-5 bg-white">
+  <div class="container py-3">
+    
+    <div class="text-center mb-5" style="max-width: 680px; margin: 0 auto;">
+      <span class="badge px-3 py-1 mb-2 fw-semibold" style="background-color: var(--unsm-green-bg); color: var(--unsm-green-primary);">
+        Propósito Institucional
+      </span>
+      <h3 class="fw-bold text-dark">¿Cómo contribuye AlertaU a la UNSM?</h3>
+      <p class="text-muted small">
+        La plataforma transforma datos de avance curricular en decisiones preventivas oportunas 
+        para reducir la deserción y fortalecer la permanencia universitaria.
+      </p>
+    </div>
+
+    <div class="row g-4">
+      
+      <!-- Pilar 1 -->
+      <div class="col-md-4">
+        <div class="card-clean p-4 h-100">
+          <div class="stat-icon mb-3" style="width: 48px; height: 48px; border-radius: 8px; background-color: var(--unsm-green-bg); display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-search fs-4" style="color: var(--unsm-green-primary);"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Detección Oportuna</h5>
+          <p class="text-muted small mb-0">
+            Analiza 20 factores académicos consolidados (cursos matriculados, aprobados, GPA acumulado y desaprobaciones en historial) antes del inicio del siguiente ciclo lectivo.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pilar 2 -->
+      <div class="col-md-4">
+        <div class="card-clean p-4 h-100">
+          <div class="stat-icon mb-3" style="width: 48px; height: 48px; border-radius: 8px; background-color: var(--risk-mod-bg); display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-person-heart fs-4" style="color: var(--risk-mod-text);"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Tutoría Focalizada</h5>
+          <p class="text-muted small mb-0">
+            Orienta la labor de directores de escuela y tutores académicos hacia los casos con riesgo moderado o alto, optimizando el tiempo y recursos de asesoría.
+          </p>
+        </div>
+      </div>
+
+      <!-- Pilar 3 -->
+      <div class="col-md-4">
+        <div class="card-clean p-4 h-100">
+          <div class="stat-icon mb-3" style="width: 48px; height: 48px; border-radius: 8px; background-color: var(--risk-high-bg); display: flex; align-items: center; justify-content: center;">
+            <i class="bi bi-graph-up-arrow fs-4" style="color: var(--risk-high-text);"></i>
+          </div>
+          <h5 class="fw-bold text-dark mb-2">Decisiones con Evidencia</h5>
+          <p class="text-muted small mb-0">
+            Reportes consolidados por periodo y distribución de riesgo que facilitan el diagnóstico curricular y los planes de nivelación en facultades de la UNSM.
+          </p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Call to action final -->
+    <div class="mt-5 p-4 rounded-3 text-center border" style="background-color: var(--unsm-green-subtle);">
+      <h5 class="fw-bold text-dark mb-2">Acceso Reservado para Docentes y Personal Académico</h5>
+      <p class="text-muted small mb-3">Ingrese con su usuario institucional para acceder a las herramientas de predicción y consulta.</p>
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="btn btn-unsm px-4">Ir al Dashboard</a>
+      {% else %}
+        <a href="{% url 'login' %}" class="btn btn-unsm px-4">Ingresar al Sistema</a>
+      {% endif %}
+    </div>
+
+  </div>
+</section>
+{% endblock %}

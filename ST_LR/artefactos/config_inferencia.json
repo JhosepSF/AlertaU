@@ -1,0 +1,59 @@
+{
+  "selected_model": "ST-LR",
+  "family": "Self-Training",
+  "variant": "Logistic Regression",
+  "artifact_model": "artefactos/modelo_final.joblib",
+  "artifact_preprocessor": "artefactos/preprocesador_V2.joblib",
+  "features": [
+    "cursos_t0",
+    "cursos_t1",
+    "aprobados_t0",
+    "aprobados_t1",
+    "desaprobados_t0",
+    "desaprobados_t1",
+    "retirados_t0",
+    "media_simple_t0",
+    "media_simple_t1",
+    "gpa_t0",
+    "gpa_t1",
+    "gpa_acumulado_t0",
+    "gpa_acumulado_t1",
+    "creditos_aprobados_t0",
+    "creditos_aprobados_t1",
+    "creditos_totales_t0",
+    "creditos_totales_t1",
+    "matriculas_repetidas_t1",
+    "desaprobaciones_historial",
+    "n_cursos_pendientes_al_corte"
+  ],
+  "features_count": 20,
+  "feature_order_required": true,
+  "numeric_input": true,
+  "positive_class": 1,
+  "negative_class": 0,
+  "classes": [
+    {
+      "value": 0,
+      "es": "Sin recurrencia verificada (horizonte de dos semestres)",
+      "en": "No verified recurrent failure (two-semester horizon)"
+    },
+    {
+      "value": 1,
+      "es": "Recurrencia de desaprobacion",
+      "en": "Recurrent course failure"
+    }
+  ],
+  "risk_probability": "predict_proba column corresponding to classes_=1",
+  "threshold": 0.3,
+  "horizon": "dos semestres academicos posteriores al semestre de corte",
+  "target_population": "estudiantes con al menos una asignatura previamente desaprobada y pendiente al corte",
+  "eligible_only": true,
+  "output_not_a_diagnosis": true,
+  "training_split": "V2_Split_Comun_2025I",
+  "validation_rule": "hiperparametros y umbral determinados con VALIDACION, nunca con TEST",
+  "inference_library": "scikit-learn 1.6.1",
+  "python_at_export": "3.13.16",
+  "export_utc": "2026-10-21T00:01:11.152825+00:00",
+  "status": "prototipo_academico_pendiente_validacion_institucional",
+  "warning": "Estimacion estadistica para apoyo academico. No debe usarse como unica base de decisiones sancionadoras o exclusion."
+}

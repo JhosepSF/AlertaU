@@ -1,0 +1,62 @@
+[
+  {
+    "id": "EJEMPLO_FICTICIO_01",
+    "tipo": "ficticio_no_estudiante_real",
+    "variables": {
+      "cursos_t0": 6.0,
+      "cursos_t1": 6.0,
+      "aprobados_t0": 4.0,
+      "aprobados_t1": 4.0,
+      "desaprobados_t0": 2.0,
+      "desaprobados_t1": 2.0,
+      "retirados_t0": 0.0,
+      "media_simple_t0": 12.0,
+      "media_simple_t1": 12.0,
+      "gpa_t0": 12.0,
+      "gpa_t1": 12.0,
+      "gpa_acumulado_t0": 12.0,
+      "gpa_acumulado_t1": 12.0,
+      "creditos_aprobados_t0": 16.0,
+      "creditos_aprobados_t1": 16.0,
+      "creditos_totales_t0": 22.0,
+      "creditos_totales_t1": 22.0,
+      "matriculas_repetidas_t1": 1.0,
+      "desaprobaciones_historial": 2.0,
+      "n_cursos_pendientes_al_corte": 2.0
+    },
+    "prediccion_demo": {
+      "probabilidad": 0.9472649136116276,
+      "clase": 1
+    }
+  },
+  {
+    "id": "EJEMPLO_FICTICIO_02",
+    "tipo": "ficticio_no_estudiante_real",
+    "variables": {
+      "cursos_t0": 6.0,
+      "cursos_t1": 6.0,
+      "aprobados_t0": 4.0,
+      "aprobados_t1": 3.0,
+      "desaprobados_t0": 2.0,
+      "desaprobados_t1": 3.0,
+      "retirados_t0": 0.0,
+      "media_simple_t0": 12.0,
+      "media_simple_t1": 12.0,
+      "gpa_t0": 12.0,
+      "gpa_t1": 10.0,
+      "gpa_acumulado_t0": 12.0,
+      "gpa_acumulado_t1": 12.0,
+      "creditos_aprobados_t0": 16.0,
+      "creditos_aprobados_t1": 16.0,
+      "creditos_totales_t0": 22.0,
+      "creditos_totales_t1": 22.0,
+      "matriculas_repetidas_t1": 1.0,
+      "desaprobaciones_historial": 3.0,
+      "n_cursos_pendientes_al_corte": 3.0
+    },
+    "prediccion_demo": {
+      "probabilidad": 0.999380998608079,
+      "clase": 1
+    }
+  }
+]

@@ -1,0 +1,17 @@
+# ==============================================================================
+# AlertaU - Dependencias del Sistema Web y Modelo Predictivo ST-LR (UNSM)
+# ==============================================================================
+
+# Framework Web Django
+Django>=5.0,<6.1
+asgiref>=3.8.1
+sqlparse>=0.5.0
+
+# Inferencia de Machine Learning (Tesis Riva - ST-LR)
+# Nota: scikit-learn 1.6.1 garantiza compatibilidad exacta con los artefactos joblib
+scikit-learn==1.6.1
+joblib>=1.4.0
+numpy>=1.26.0,<2.3.0
+pandas>=2.2.0
+scipy>=1.13.0
+threadpoolctl>=3.5.0

@@ -1,0 +1,301 @@
+{% extends 'alertau/base.html' %}
+{% load static %}
+
+{% block title %}Predicción Individual de Riesgo - AlertaU | UNSM{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Migajas de pan / Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-success">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Predicción Individual</li>
+    </ol>
+  </nav>
+
+  <!-- Encabezado de la Página -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+      <h1 class="h3 fw-bold text-dark mb-1">Evaluación Predictiva Individual</h1>
+      <p class="text-muted small mb-0">
+        Ingrese las 20 variables académicas del estudiante para estimar el riesgo de desaprobación recurrente con el modelo ST-LR.
+      </p>
+    </div>
+
+    <!-- Acciones Rápidas de Carga de Casos de Prueba -->
+    <div class="d-flex flex-wrap align-items-center gap-2 mt-3 mt-md-0">
+      <span class="small text-muted me-1"><i class="bi bi-lightning-charge text-warning"></i> Casos demo:</span>
+      <button type="button" id="btn-cargar-caso-1" class="btn btn-outline-danger btn-sm" title="Cargar Caso Ficticio 01 de Tesis Riva">
+        Alto Riesgo
+      </button>
+      <button type="button" id="btn-cargar-caso-2" class="btn btn-outline-warning btn-sm" title="Cargar Caso Ficticio 02">
+        Riesgo Moderado
+      </button>
+      <button type="button" id="btn-cargar-caso-3" class="btn btn-outline-success btn-sm" title="Cargar Caso Ficticio 03">
+        Bajo Riesgo
+      </button>
+    </div>
+  </div>
+
+  <!-- Formulario Principal -->
+  <form method="post" action="{% url 'prediccion_individual' %}" class="needs-validation">
+    {% csrf_token %}
+
+    <!-- Card 1: Datos de Identificación y Elegibilidad -->
+    <div class="card-clean p-4 mb-4">
+      <div class="form-section-title">
+        <i class="bi bi-person-vcard text-success"></i> 1. Identificación y Verificación de Elegibilidad
+      </div>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label for="id_codigo_estudiante" class="form-label">
+            Código o ID del Estudiante <span class="text-danger">*</span>
+          </label>
+          {{ form.codigo_estudiante }}
+          {% if form.codigo_estudiante.errors %}
+            <div class="text-danger small mt-1">{{ form.codigo_estudiante.errors.0 }}</div>
+          {% endif %}
+          <div class="form-text">Identificador institucional universitario.</div>
+        </div>
+
+        <div class="col-md-5">
+          <label for="id_nombre_referencial" class="form-label">Nombre o Referencia Académica</label>
+          {{ form.nombre_referencial }}
+          {% if form.nombre_referencial.errors %}
+            <div class="text-danger small mt-1">{{ form.nombre_referencial.errors.0 }}</div>
+          {% endif %}
+          <div class="form-text">Opcional para reportes y seguimiento.</div>
+        </div>
+
+        <div class="col-md-3">
+          <label for="id_periodo_corte" class="form-label">Periodo de Corte (t1)</label>
+          {{ form.periodo_corte }}
+          {% if form.periodo_corte.errors %}
+            <div class="text-danger small mt-1">{{ form.periodo_corte.errors.0 }}</div>
+          {% endif %}
+          <div class="form-text">Ejemplo: 2025-I</div>
+        </div>
+      </div>
+
+      <!-- Condición de Elegibilidad Formal (Requisito Metodológico) -->
+      <div class="mt-3 p-3 rounded-2 border" style="background-color: var(--unsm-green-subtle);">
+        <div class="form-check">
+          {{ form.elegible_confirmado }}
+          <label class="form-check-label fw-semibold small text-dark" for="id_elegible_confirmado">
+            Verificación de Elegibilidad: Confirmo que el estudiante posee al menos una asignatura previamente desaprobada y pendiente de subsanar al corte.
+          </label>
+        </div>
+        <div class="small text-muted mt-1 ps-4">
+          El contrato de inferencia del modelo ST-LR exige que solo se evalúen estudiantes de la población elegible.
+        </div>
+        {% if form.elegible_confirmado.errors %}
+          <div class="text-danger small ps-4 mt-1">{{ form.elegible_confirmado.errors.0 }}</div>
+        {% endif %}
+      </div>
+
+    </div>
+
+    <!-- Card 2: Asignaturas Matriculadas y Aprobadas (t0 y t1) -->
+    <div class="card-clean p-4 mb-4">
+      <div class="form-section-title">
+        <i class="bi bi-book text-success"></i> 2. Dinámica de Cursos Matriculados, Aprobados y Desaprobados
+      </div>
+      <p class="text-muted small mb-3">
+        Compare el periodo anterior (<strong>t0</strong>) con el periodo de corte actual (<strong>t1</strong>).
+      </p>
+
+      <div class="row g-3">
+        <!-- t0 -->
+        <div class="col-md-6 border-end-md pe-md-4">
+          <div class="badge bg-light text-secondary border mb-2">Periodo Previo (t0)</div>
+          
+          <div class="mb-3">
+            <label for="id_cursos_t0" class="form-label">N° de Cursos Matriculados en t0</label>
+            {{ form.cursos_t0 }}
+          </div>
+          <div class="row g-2">
+            <div class="col-sm-6 mb-3">
+              <label for="id_aprobados_t0" class="form-label text-success">Cursos Aprobados en t0</label>
+              {{ form.aprobados_t0 }}
+            </div>
+            <div class="col-sm-6 mb-3">
+              <label for="id_desaprobados_t0" class="form-label text-danger">Cursos Desaprobados en t0</label>
+              {{ form.desaprobados_t0 }}
+            </div>
+          </div>
+          <div>
+            <label for="id_retirados_t0" class="form-label text-muted">Cursos Retirados en t0</label>
+            {{ form.retirados_t0 }}
+          </div>
+        </div>
+
+        <!-- t1 -->
+        <div class="col-md-6 ps-md-4">
+          <div class="badge bg-light text-success border border-success-subtle mb-2">Periodo de Corte (t1)</div>
+          
+          <div class="mb-3">
+            <label for="id_cursos_t1" class="form-label">N° de Cursos Matriculados en t1</label>
+            {{ form.cursos_t1 }}
+          </div>
+          <div class="row g-2">
+            <div class="col-sm-6 mb-3">
+              <label for="id_aprobados_t1" class="form-label text-success">Cursos Aprobados en t1</label>
+              {{ form.aprobados_t1 }}
+            </div>
+            <div class="col-sm-6 mb-3">
+              <label for="id_desaprobados_t1" class="form-label text-danger">Cursos Desaprobados en t1</label>
+              {{ form.desaprobados_t1 }}
+            </div>
+          </div>
+          <div class="p-2 rounded bg-light border text-muted small mt-2">
+            <i class="bi bi-info-circle me-1"></i> La suma de aprobados y desaprobados debe ser consistente con los cursos matriculados.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Calificaciones, Media Simple y GPA (0 a 20) -->
+    <div class="card-clean p-4 mb-4">
+      <div class="form-section-title">
+        <i class="bi bi-mortarboard text-success"></i> 3. Rendimiento Académico, Media Simple y GPA (Escala 0 - 20)
+      </div>
+
+      <div class="row g-3">
+        <!-- Media Simple -->
+        <div class="col-md-4">
+          <div class="p-3 rounded border bg-light h-100">
+            <div class="fw-semibold text-dark small mb-2"><i class="bi bi-calculator me-1"></i> Media Simple</div>
+            <div class="mb-2">
+              <label for="id_media_simple_t0" class="form-label">Media Simple t0</label>
+              {{ form.media_simple_t0 }}
+            </div>
+            <div>
+              <label for="id_media_simple_t1" class="form-label">Media Simple t1</label>
+              {{ form.media_simple_t1 }}
+            </div>
+          </div>
+        </div>
+
+        <!-- GPA Semestral -->
+        <div class="col-md-4">
+          <div class="p-3 rounded border bg-light h-100">
+            <div class="fw-semibold text-dark small mb-2"><i class="bi bi-award me-1"></i> GPA del Semestre</div>
+            <div class="mb-2">
+              <label for="id_gpa_t0" class="form-label">GPA t0 (Promedio semestral)</label>
+              {{ form.gpa_t0 }}
+            </div>
+            <div>
+              <label for="id_gpa_t1" class="form-label">GPA t1 (Promedio semestral)</label>
+              {{ form.gpa_t1 }}
+            </div>
+          </div>
+        </div>
+
+        <!-- GPA Acumulado -->
+        <div class="col-md-4">
+          <div class="p-3 rounded border bg-light h-100">
+            <div class="fw-semibold text-dark small mb-2"><i class="bi bi-layers me-1"></i> GPA Acumulado</div>
+            <div class="mb-2">
+              <label for="id_gpa_acumulado_t0" class="form-label">GPA Acumulado al cierre t0</label>
+              {{ form.gpa_acumulado_t0 }}
+            </div>
+            <div>
+              <label for="id_gpa_acumulado_t1" class="form-label">GPA Acumulado al cierre t1</label>
+              {{ form.gpa_acumulado_t1 }}
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Card 4: Créditos y Factores Críticos de Historial -->
+    <div class="card-clean p-4 mb-4">
+      <div class="form-section-title">
+        <i class="bi bi-exclamation-octagon text-success"></i> 4. Avance en Créditos y Factores de Reincidencia
+      </div>
+
+      <div class="row g-3 mb-3">
+        <!-- Créditos t0 -->
+        <div class="col-md-3">
+          <label for="id_creditos_aprobados_t0" class="form-label">Créditos Aprobados t0</label>
+          {{ form.creditos_aprobados_t0 }}
+        </div>
+        <div class="col-md-3">
+          <label for="id_creditos_totales_t0" class="form-label">Créditos Totales t0</label>
+          {{ form.creditos_totales_t0 }}
+        </div>
+        <!-- Créditos t1 -->
+        <div class="col-md-3">
+          <label for="id_creditos_aprobados_t1" class="form-label">Créditos Aprobados t1</label>
+          {{ form.creditos_aprobados_t1 }}
+        </div>
+        <div class="col-md-3">
+          <label for="id_creditos_totales_t1" class="form-label">Créditos Totales t1</label>
+          {{ form.creditos_totales_t1 }}
+        </div>
+      </div>
+
+      <!-- Variables Críticas de Riesgo -->
+      <div class="row g-3 pt-3 border-top">
+        <div class="col-md-4">
+          <div class="p-3 rounded border" style="background-color: var(--risk-mod-bg);">
+            <label for="id_matriculas_repetidas_t1" class="form-label fw-bold" style="color: var(--risk-mod-text);">
+              Matrículas Repetidas en t1
+            </label>
+            {{ form.matriculas_repetidas_t1 }}
+            <div class="form-text" style="color: var(--risk-mod-text); font-size: 0.74rem;">
+              Asignaturas matriculadas por 2da o 3ra oportunidad en t1.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="p-3 rounded border" style="background-color: var(--color-gray-50);">
+            <label for="id_desaprobaciones_historial" class="form-label fw-bold text-dark">
+              Desaprobaciones en Historial
+            </label>
+            {{ form.desaprobaciones_historial }}
+            <div class="form-text">
+              Total acumulado de cursos desaprobados a lo largo de la carrera.
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="p-3 rounded border" style="background-color: var(--risk-high-bg);">
+            <label for="id_n_cursos_pendientes_al_corte" class="form-label fw-bold" style="color: var(--risk-high-text);">
+              Cursos Pendientes al Corte
+            </label>
+            {{ form.n_cursos_pendientes_al_corte }}
+            <div class="form-text" style="color: var(--risk-high-text); font-size: 0.74rem;">
+              Número de cursos desaprobados que aún no han sido aprobados.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Botón de Envío y Acciones -->
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 p-3 bg-white rounded-3 border">
+      <a href="{% url 'dashboard' %}" class="btn btn-light border">
+        <i class="bi bi-arrow-left me-1"></i> Cancelar y Volver
+      </a>
+
+      <div class="d-flex align-items-center gap-2">
+        <button type="reset" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-counterclockwise me-1"></i> Limpiar
+        </button>
+        <button type="submit" class="btn btn-unsm px-4 py-2">
+          <i class="bi bi-cpu-fill me-2"></i> Predecir Riesgo
+        </button>
+      </div>
+    </div>
+
+  </form>
+
+</div>
+{% endblock %}

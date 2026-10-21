@@ -1,0 +1,29 @@
+{
+  "seleccionadas": [
+    "cursos_t0",
+    "cursos_t1",
+    "aprobados_t0",
+    "aprobados_t1",
+    "desaprobados_t0",
+    "desaprobados_t1",
+    "retirados_t0",
+    "media_simple_t0",
+    "media_simple_t1",
+    "gpa_t0",
+    "gpa_t1",
+    "gpa_acumulado_t0",
+    "gpa_acumulado_t1",
+    "creditos_aprobados_t0",
+    "creditos_aprobados_t1",
+    "creditos_totales_t0",
+    "creditos_totales_t1",
+    "matriculas_repetidas_t1",
+    "desaprobaciones_historial",
+    "n_cursos_pendientes_al_corte"
+  ],
+  "descartadas_constantes": [
+    "retirados_t1",
+    "matriculas_repetidas_t0"
+  ],
+  "descartadas_completamente_nulas": []
+}

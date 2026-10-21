@@ -1,0 +1,12 @@
+{
+  "PRUEBA_INFERENCIA_OK.txt": "3596881686e4c6813245f58a64943e1fae87bf77f46b939f0f886a3abcc67045",
+  "README_DJANGO.txt": "a3e1a7f05323e3d26ffc57fe7bf99d10bb5f139a2dc7c19befb18f3aec6395c5",
+  "__pycache__/inferencia_django.cpython-313.pyc": "bdc5ffd0f21e6ded1e80a2f4f773b457610f94919fb4d2070720a9ad001b67cb",
+  "artefactos/config_inferencia.json": "7eec9cd29dfab81d331939a5b78287415c9a3d5d539a75014f1839b5c4665ddc",
+  "artefactos/mejor_configuracion_validacion.json": "e9013af1e2b74a2691101361be9bb5479724f5ffce3582402cdc7803c98d82a3",
+  "artefactos/modelo_final.joblib": "2e59b8502256002071183519fe2883431862e92a4f8b780a4dd94c5401eadfb2",
+  "artefactos/predictores_originales.json": "62ece9c934c2eace719c97da722c751dbe74dababc63062977e030b693802861",
+  "artefactos/preprocesador_V2.joblib": "6e4afca7e6484f7d720a573447f2bb33f31d6cf8dfdaaccabd1a97dfffe6ed6f",
+  "ejemplos/ejemplos_ficticios.json": "405f703db96b80a2e8b17f31aa5d72620225d0a5d7840edfeddeecc0bcc88efd",
+  "inferencia_django.py": "7eb3b736799d44ecec5eb75264bb9418b4d4e74413684efc2e48b9989c382c38"
+}

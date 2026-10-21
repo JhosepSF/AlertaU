@@ -1,0 +1,200 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}AlertaU - Universidad Nacional de San Martín{% endblock %}</title>
+
+  <!-- Favicon Institucional -->
+  <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}">
+  <link rel="icon" type="image/svg+xml" href="{% static 'img/favicon.svg' %}">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5.3 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <!-- Estilos Personalizados AlertaU -->
+  <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Header / Barra de Navegación Institucional -->
+  <header class="navbar-alertau sticky-top">
+    <div class="container-fluid px-3 px-lg-4">
+      <div class="d-flex align-items-center justify-content-between w-100">
+        
+        <!-- Identidad Institucional & Logo UNSM -->
+        <div class="d-flex align-items-center">
+          <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'inicio' %}{% endif %}" class="d-flex align-items-center text-decoration-none">
+            
+            <!-- Espacio reservado para Logo oficial de la UNSM -->
+            <div class="unsm-logo-box me-2" title="Espacio oficial para Logo UNSM">
+              <img src="{% static 'img/logo_unsm.png' %}" alt="Logo UNSM" class="unsm-logo-img" onerror="this.style.display='none'; document.getElementById('placeholder-unsm-nav').style.display='inline-flex';">
+              <span id="placeholder-unsm-nav" class="unsm-logo-placeholder" style="display: none;">Logo UNSM</span>
+            </div>
+
+            <div class="border-start ps-2 ms-1 border-secondary-subtle">
+              <span class="navbar-brand-title">AlertaU</span>
+              <span class="navbar-brand-sub d-none d-sm-block">Universidad Nacional de San Martín</span>
+            </div>
+          </a>
+        </div>
+
+        <!-- Menú de Navegación -->
+        <nav class="d-none d-lg-flex align-items-center gap-1">
+          <a href="{% url 'inicio' %}" class="nav-link-alertau {% if request.resolver_match.url_name == 'inicio' %}active{% endif %}">
+            <i class="bi bi-house me-1"></i> Inicio
+          </a>
+          
+          {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="nav-link-alertau {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+              <i class="bi bi-speedometer2 me-1"></i> Dashboard
+            </a>
+            <a href="{% url 'prediccion_individual' %}" class="nav-link-alertau {% if request.resolver_match.url_name == 'prediccion_individual' or request.resolver_match.url_name == 'resultado_prediccion' %}active{% endif %}">
+              <i class="bi bi-person-check me-1"></i> Predicción individual
+            </a>
+            <a href="{% url 'carga_masiva' %}" class="nav-link-alertau {% if request.resolver_match.url_name == 'carga_masiva' %}active{% endif %}">
+              <i class="bi bi-upload me-1"></i> Carga de datos
+            </a>
+            <a href="{% url 'historial' %}" class="nav-link-alertau {% if request.resolver_match.url_name == 'historial' or request.resolver_match.url_name == 'detalle_prediccion' %}active{% endif %}">
+              <i class="bi bi-clock-history me-1"></i> Historial
+            </a>
+            <a href="{% url 'reportes' %}" class="nav-link-alertau {% if request.resolver_match.url_name == 'reportes' %}active{% endif %}">
+              <i class="bi bi-bar-chart-line me-1"></i> Reportes
+            </a>
+            <a href="{% url 'ayuda' %}" class="nav-link-alertau {% if request.resolver_match.url_name == 'ayuda' %}active{% endif %}">
+              <i class="bi bi-question-circle me-1"></i> Ayuda
+            </a>
+          {% endif %}
+        </nav>
+
+        <!-- Acceso / Perfil de Usuario -->
+        <div class="d-flex align-items-center gap-2">
+          {% if user.is_authenticated %}
+            <div class="dropdown">
+              <button class="btn btn-unsm-soft btn-sm dropdown-toggle d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-badge"></i>
+                <span class="d-none d-md-inline">{{ user.first_name|default:user.username }}</span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end shadow-sm border-gray-200">
+                <li class="px-3 py-2 border-bottom">
+                  <div class="fw-semibold small text-dark">{{ user.username }}</div>
+                  <div class="text-muted" style="font-size: 0.75rem;">Usuario Institucional UNSM</div>
+                </li>
+                <li><a class="dropdown-item py-2 small" href="{% url 'dashboard' %}"><i class="bi bi-speedometer2 me-2"></i>Ir al Dashboard</a></li>
+                <li><a class="dropdown-item py-2 small" href="{% url 'prediccion_individual' %}"><i class="bi bi-cpu me-2"></i>Nueva Predicción</a></li>
+                <li><a class="dropdown-item py-2 small" href="{% url 'ayuda' %}"><i class="bi bi-info-circle me-2"></i>Guía y Glosario</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                  <form method="post" action="{% url 'logout' %}" class="m-0 p-0">
+                    {% csrf_token %}
+                    <button type="submit" class="dropdown-item text-danger py-2 small">
+                      <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+                    </button>
+                  </form>
+                </li>
+              </ul>
+            </div>
+          {% else %}
+            <a href="{% url 'login' %}" class="btn btn-unsm btn-sm">
+              <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión
+            </a>
+          {% endif %}
+
+          <!-- Menú Toggle Móvil -->
+          <button class="btn btn-light d-lg-none border" type="button" data-bs-toggle="collapse" data-bs-target="#mobileNav" aria-expanded="false" aria-label="Menú">
+            <i class="bi bi-list"></i>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Menú Colapsable Móvil -->
+      <div class="collapse d-lg-none mt-2 pt-2 border-top" id="mobileNav">
+        <div class="d-flex flex-column gap-1 pb-2">
+          <a href="{% url 'inicio' %}" class="nav-link-alertau py-2">
+            <i class="bi bi-house me-2"></i> Inicio
+          </a>
+          {% if user.is_authenticated %}
+            <a href="{% url 'dashboard' %}" class="nav-link-alertau py-2"><i class="bi bi-speedometer2 me-2"></i> Dashboard</a>
+            <a href="{% url 'prediccion_individual' %}" class="nav-link-alertau py-2"><i class="bi bi-person-check me-2"></i> Predicción individual</a>
+            <a href="{% url 'carga_masiva' %}" class="nav-link-alertau py-2"><i class="bi bi-upload me-2"></i> Carga de datos</a>
+            <a href="{% url 'historial' %}" class="nav-link-alertau py-2"><i class="bi bi-clock-history me-2"></i> Historial</a>
+            <a href="{% url 'reportes' %}" class="nav-link-alertau py-2"><i class="bi bi-bar-chart-line me-2"></i> Reportes</a>
+            <a href="{% url 'ayuda' %}" class="nav-link-alertau py-2"><i class="bi bi-question-circle me-2"></i> Ayuda</a>
+            <form method="post" action="{% url 'logout' %}" class="mt-2">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-danger btn-sm w-100 text-start">
+                <i class="bi bi-box-arrow-right me-2"></i>Cerrar sesión
+              </button>
+            </form>
+          {% else %}
+            <a href="{% url 'login' %}" class="btn btn-unsm btn-sm mt-2"><i class="bi bi-box-arrow-in-right me-2"></i>Iniciar sesión</a>
+          {% endif %}
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Mensajes de Notificación -->
+  {% if messages %}
+    <div class="container mt-3">
+      {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show shadow-sm border-0" role="alert">
+          <div class="d-flex align-items-center">
+            {% if message.tags == 'success' %}
+              <i class="bi bi-check-circle-fill me-2 fs-5 text-success"></i>
+            {% elif message.tags == 'error' %}
+              <i class="bi bi-exclamation-triangle-fill me-2 fs-5 text-danger"></i>
+            {% else %}
+              <i class="bi bi-info-circle-fill me-2 fs-5 text-primary"></i>
+            {% endif %}
+            <div>{{ message }}</div>
+          </div>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Contenido Principal -->
+  <main class="flex-grow-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer Institucional -->
+  <footer class="footer-alertau">
+    <div class="container">
+      <div class="row align-items-center gy-3">
+        <div class="col-md-6 text-center text-md-start">
+          <div class="fw-semibold text-dark">AlertaU • Universidad Nacional de San Martín</div>
+          <div class="text-muted" style="font-size: 0.8rem;">
+            Sistema inteligente para la predicción del riesgo de desaprobación recurrente
+          </div>
+        </div>
+        <div class="col-md-6 text-center text-md-end">
+          <div class="d-inline-flex align-items-center gap-2">
+            <span class="unsm-logo-placeholder" style="font-size: 0.7rem;">Logo UNSM</span>
+            <span class="text-muted" style="font-size: 0.8rem;">Uso académico y preventivo no sancionador</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap 5.3 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Main JS -->
+  <script src="{% static 'js/main.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

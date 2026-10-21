@@ -1,0 +1,351 @@
+{% extends 'alertau/base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Principal - AlertaU | UNSM{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 px-lg-4 py-4">
+
+  <!-- Encabezado del Dashboard -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <h1 class="h3 fw-bold text-dark mb-0">Panel de Control Académico</h1>
+        <span class="badge bg-light text-success border border-success-subtle small">
+          <i class="bi bi-shield-check me-1"></i>UNSM
+        </span>
+      </div>
+      <p class="text-muted small mb-0">
+        Monitoreo consolidado de riesgo de desaprobación recurrente y avance del modelo ST-LR
+      </p>
+    </div>
+
+    <!-- Botones de Acción Rápida -->
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0">
+      <a href="{% url 'prediccion_individual' %}" class="btn btn-unsm btn-sm">
+        <i class="bi bi-plus-circle me-1"></i> Nueva Predicción
+      </a>
+      <a href="{% url 'carga_masiva' %}" class="btn btn-unsm-outline btn-sm">
+        <i class="bi bi-upload me-1"></i> Carga Masiva
+      </a>
+      <a href="{% url 'reportes' %}" class="btn btn-light btn-sm border">
+        <i class="bi bi-file-earmark-bar-graph me-1"></i> Reporte
+      </a>
+    </div>
+  </div>
+
+  <!-- Tarjetas Resumen de Métricas (Requisito 3) -->
+  <div class="row g-3 mb-4">
+    
+    <!-- Total Estudiantes Evaluados -->
+    <div class="col-sm-6 col-xl-3">
+      <div class="stat-card stat-primary">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="stat-value">{{ total_estudiantes }}</div>
+            <div class="stat-label">Total Estudiantes Evaluados</div>
+            <div class="text-muted mt-2" style="font-size: 0.76rem;">
+              {{ total_evaluaciones }} evaluación(es) en total
+            </div>
+          </div>
+          <div class="stat-icon">
+            <i class="bi bi-people"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Alto Riesgo -->
+    <div class="col-sm-6 col-xl-3">
+      <div class="stat-card stat-danger">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="stat-value text-danger">{{ alto_riesgo_count }}</div>
+            <div class="stat-label">Estudiantes en Alto Riesgo</div>
+            <div class="text-danger mt-2 fw-semibold" style="font-size: 0.76rem;">
+              {{ pct_alto }}% del total registrado
+            </div>
+          </div>
+          <div class="stat-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Riesgo Moderado -->
+    <div class="col-sm-6 col-xl-3">
+      <div class="stat-card stat-warning">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="stat-value text-warning-emphasis">{{ moderado_riesgo_count }}</div>
+            <div class="stat-label">Estudiantes en Riesgo Moderado</div>
+            <div class="text-secondary mt-2 fw-semibold" style="font-size: 0.76rem;">
+              {{ pct_moderado }}% del total registrado
+            </div>
+          </div>
+          <div class="stat-icon">
+            <i class="bi bi-exclamation-circle"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bajo Riesgo -->
+    <div class="col-sm-6 col-xl-3">
+      <div class="stat-card stat-success">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="stat-value text-success">{{ bajo_riesgo_count }}</div>
+            <div class="stat-label">Estudiantes en Bajo Riesgo</div>
+            <div class="text-success mt-2 fw-semibold" style="font-size: 0.76rem;">
+              {{ pct_bajo }}% del total registrado
+            </div>
+          </div>
+          <div class="stat-icon">
+            <i class="bi bi-check-circle"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Barra informativa de última actualización y estado del modelo -->
+  <div class="card-clean p-3 mb-4 bg-white d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2">
+    <div class="d-flex align-items-center gap-2 small text-secondary">
+      <i class="bi bi-clock-history text-success"></i>
+      <span>Última fecha de actualización: 
+        <strong>
+          {% if ultima_actualizacion %}
+            {{ ultima_actualizacion|date:"d/m/Y - H:i" }}
+          {% else %}
+            Sin evaluaciones recientes
+          {% endif %}
+        </strong>
+      </span>
+    </div>
+    <div class="d-flex align-items-center gap-3 small">
+      <span class="badge bg-light text-secondary border">
+        Umbral oficial: <strong>{{ modelo_info.umbral|default:"0.30" }} (30%)</strong>
+      </span>
+      <span class="badge bg-light text-success border border-success-subtle">
+        <i class="bi bi-cpu me-1"></i>Estimador ST-LR Operativo
+      </span>
+    </div>
+  </div>
+
+  <!-- Fila: Distribución Porcentual y Acciones Rápidas -->
+  <div class="row g-4 mb-4">
+    
+    <!-- Distribución Visual del Riesgo -->
+    <div class="col-lg-6">
+      <div class="card-clean h-100">
+        <div class="card-header-clean d-flex justify-content-between align-items-center">
+          <span><i class="bi bi-pie-chart me-2 text-success"></i>Distribución de Casos por Nivel de Riesgo</span>
+          <a href="{% url 'reportes' %}" class="small text-decoration-none text-success">Ver Reporte</a>
+        </div>
+        <div class="p-4">
+          
+          <!-- Barra de progreso acumulada -->
+          <div class="progress mb-4" style="height: 22px; border-radius: 6px; overflow: hidden; background-color: var(--color-gray-100);">
+            <div class="progress-bar" role="progressbar" style="width: {{ pct_alto }}%; background-color: #e02424;" aria-valuenow="{{ pct_alto }}" aria-valuemin="0" aria-valuemax="100" title="Alto Riesgo: {{ pct_alto }}%">
+              {% if pct_alto > 8 %}{{ pct_alto }}%{% endif %}
+            </div>
+            <div class="progress-bar" role="progressbar" style="width: {{ pct_moderado }}%; background-color: #d97706;" aria-valuenow="{{ pct_moderado }}" aria-valuemin="0" aria-valuemax="100" title="Riesgo Moderado: {{ pct_moderado }}%">
+              {% if pct_moderado > 8 %}{{ pct_moderado }}%{% endif %}
+            </div>
+            <div class="progress-bar" role="progressbar" style="width: {{ pct_bajo }}%; background-color: var(--unsm-green-primary);" aria-valuenow="{{ pct_bajo }}" aria-valuemin="0" aria-valuemax="100" title="Bajo Riesgo: {{ pct_bajo }}%">
+              {% if pct_bajo > 8 %}{{ pct_bajo }}%{% endif %}
+            </div>
+          </div>
+
+          <!-- Desglose por Niveles -->
+          <div class="space-y-3">
+            
+            <div class="d-flex align-items-center justify-content-between p-2 rounded mb-2" style="background-color: var(--risk-high-bg);">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                <span class="fw-semibold small" style="color: var(--risk-high-text);">Alto Riesgo (&ge; 65% probabilidad)</span>
+              </div>
+              <div class="fw-bold small" style="color: var(--risk-high-text);">
+                {{ alto_riesgo_count }} estudiantes ({{ pct_alto }}%)
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between p-2 rounded mb-2" style="background-color: var(--risk-mod-bg);">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-exclamation-circle-fill text-warning-emphasis"></i>
+                <span class="fw-semibold small" style="color: var(--risk-mod-text);">Riesgo Moderado (30% - 64.9%)</span>
+              </div>
+              <div class="fw-bold small" style="color: var(--risk-mod-text);">
+                {{ moderado_riesgo_count }} estudiantes ({{ pct_moderado }}%)
+              </div>
+            </div>
+
+            <div class="d-flex align-items-center justify-content-between p-2 rounded" style="background-color: var(--risk-low-bg);">
+              <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-check-circle-fill text-success"></i>
+                <span class="fw-semibold small" style="color: var(--risk-low-text);">Bajo Riesgo (&lt; 30% umbral)</span>
+              </div>
+              <div class="fw-bold small" style="color: var(--risk-low-text);">
+                {{ bajo_riesgo_count }} estudiantes ({{ pct_bajo }}%)
+              </div>
+            </div>
+
+          </div>
+
+          <div class="mt-3 text-muted small text-center">
+            <i class="bi bi-info-circle me-1"></i> La suma de categorías corresponde a la totalidad de evaluaciones registradas en el periodo.
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Menú Rápido de Opciones y Flujo de Trabajo -->
+    <div class="col-lg-6">
+      <div class="card-clean h-100">
+        <div class="card-header-clean">
+          <i class="bi bi-grid me-2 text-success"></i>Accesos Directos y Flujos de Gestión
+        </div>
+        <div class="p-4">
+          <div class="row g-3">
+            
+            <div class="col-sm-6">
+              <a href="{% url 'prediccion_individual' %}" class="card-clean p-3 text-decoration-none d-block h-100 border hover-shadow" style="background-color: var(--color-gray-50);">
+                <div class="d-flex align-items-center gap-2 text-success mb-1">
+                  <i class="bi bi-person-plus fs-5"></i>
+                  <span class="fw-bold text-dark small">Predicción Individual</span>
+                </div>
+                <p class="text-muted small mb-0" style="font-size: 0.78rem;">
+                  Ingreso directo de las 20 variables académicas de un estudiante.
+                </p>
+              </a>
+            </div>
+
+            <div class="col-sm-6">
+              <a href="{% url 'carga_masiva' %}" class="card-clean p-3 text-decoration-none d-block h-100 border hover-shadow" style="background-color: var(--color-gray-50);">
+                <div class="d-flex align-items-center gap-2 text-primary mb-1">
+                  <i class="bi bi-file-earmark-arrow-up fs-5"></i>
+                  <span class="fw-bold text-dark small">Carga Masiva (CSV)</span>
+                </div>
+                <p class="text-muted small mb-0" style="font-size: 0.78rem;">
+                  Procesamiento en lote para cohortes y escuelas profesionales.
+                </p>
+              </a>
+            </div>
+
+            <div class="col-sm-6">
+              <a href="{% url 'historial' %}" class="card-clean p-3 text-decoration-none d-block h-100 border hover-shadow" style="background-color: var(--color-gray-50);">
+                <div class="d-flex align-items-center gap-2 text-dark mb-1">
+                  <i class="bi bi-clock-history fs-5"></i>
+                  <span class="fw-bold text-dark small">Historial Completo</span>
+                </div>
+                <p class="text-muted small mb-0" style="font-size: 0.78rem;">
+                  Búsqueda por código de estudiante y consulta de diagnósticos.
+                </p>
+              </a>
+            </div>
+
+            <div class="col-sm-6">
+              <a href="{% url 'ayuda' %}" class="card-clean p-3 text-decoration-none d-block h-100 border hover-shadow" style="background-color: var(--color-gray-50);">
+                <div class="d-flex align-items-center gap-2 text-secondary mb-1">
+                  <i class="bi bi-journal-text fs-5"></i>
+                  <span class="fw-bold text-dark small">Glosario de Variables</span>
+                </div>
+                <p class="text-muted small mb-0" style="font-size: 0.78rem;">
+                  Definición formal de t0, t1 y pautas metodológicas de la Tesis.
+                </p>
+              </a>
+            </div>
+
+          </div>
+
+          <div class="mt-4 p-3 rounded-2 bg-light border small text-muted">
+            <div class="fw-semibold text-dark mb-1"><i class="bi bi-building me-1"></i>Universidad Nacional de San Martín</div>
+            Dirección de Asuntos Académicos &bull; Comisión de Tutoría y Seguimiento Estudiantil
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tabla de Evaluaciones Recientes -->
+  <div class="card-clean">
+    <div class="card-header-clean d-flex justify-content-between align-items-center">
+      <span><i class="bi bi-table me-2 text-success"></i>Evaluaciones Recientes</span>
+      <a href="{% url 'historial' %}" class="btn btn-unsm-soft btn-sm py-1 px-3">
+        Ver Todo el Historial <i class="bi bi-arrow-right ms-1"></i>
+      </a>
+    </div>
+    
+    <div class="table-responsive">
+      <table class="table table-clean mb-0">
+        <thead>
+          <tr>
+            <th>ID / Código Estudiante</th>
+            <th>Nombre Referencial</th>
+            <th>Periodo</th>
+            <th>Resultado de Riesgo</th>
+            <th>Probabilidad</th>
+            <th>Fecha</th>
+            <th class="text-end">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in ultimas_predicciones %}
+            <tr>
+              <td class="fw-semibold text-dark">
+                <code>{{ p.codigo_estudiante }}</code>
+              </td>
+              <td>{{ p.nombre_referencial|default:"Estudiante" }}</td>
+              <td><span class="badge bg-light text-secondary border">{{ p.periodo_corte }}</span></td>
+              <td>
+                <span class="risk-badge {{ p.badge_class_custom }}">
+                  {% if p.nivel_riesgo == 'ALTO' %}
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                  {% elif p.nivel_riesgo == 'MODERADO' %}
+                    <i class="bi bi-exclamation-circle-fill"></i>
+                  {% else %}
+                    <i class="bi bi-check-circle-fill"></i>
+                  {% endif %}
+                  {{ p.get_nivel_riesgo_display }}
+                </span>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="fw-semibold">{{ p.probabilidad_porcentaje }}%</span>
+                  <div class="progress flex-grow-1" style="height: 6px; width: 60px;">
+                    <div class="progress-bar bg-{{ p.badge_css }}" style="width: {{ p.probabilidad_porcentaje }}%;"></div>
+                  </div>
+                </div>
+              </td>
+              <td class="text-muted small">{{ p.fecha_registro|date:"d/m/Y H:i" }}</td>
+              <td class="text-end">
+                <a href="{% url 'resultado_prediccion' p.pk %}" class="btn btn-light btn-sm border" title="Ver resultado">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">
+                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                Aún no hay predicciones registradas.<br>
+                <a href="{% url 'prediccion_individual' %}" class="btn btn-unsm btn-sm mt-2">
+                  Realizar la primera predicción
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

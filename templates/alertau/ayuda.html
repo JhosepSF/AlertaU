@@ -1,0 +1,200 @@
+{% extends 'alertau/base.html' %}
+{% load static %}
+
+{% block title %}Guía y Documentación Académica - AlertaU | UNSM{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <!-- Migajas de Pan -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-success">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Ayuda y Glosario Académico</li>
+    </ol>
+  </nav>
+
+  <!-- Encabezado -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+      <h1 class="h3 fw-bold text-dark mb-1">Guía del Sistema y Glosario de Variables</h1>
+      <p class="text-muted small mb-0">
+        Fundamentación conceptual, definiciones operativas de periodos t0/t1 y principios de uso ético en la UNSM.
+      </p>
+    </div>
+
+    <div class="mt-3 mt-md-0">
+      <span class="badge bg-light text-success border border-success-subtle p-2">
+        <i class="bi bi-mortarboard me-1"></i> Tesis Riva &bull; UNSM
+      </span>
+    </div>
+  </div>
+
+  <!-- Sección 1: Definición Operativa de Periodos t0 y t1 -->
+  <div class="card-clean p-4 mb-4">
+    <div class="form-section-title">
+      <i class="bi bi-calendar-range text-success"></i> 1. Marco Temporal: Definición de Periodos t0 y t1
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="p-3 rounded border h-100" style="background-color: var(--unsm-green-subtle);">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-success text-white px-2 py-1">Periodo t1</span>
+            <strong class="text-dark">Semestre de Corte o Evaluación</strong>
+          </div>
+          <p class="small text-muted mb-2">
+            Es el semestre académico más reciente que ha concluido y sobre el cual se evalúa la situación del estudiante.
+          </p>
+          <ul class="small text-secondary mb-0 ps-3">
+            <li>Define el momento exacto en el que se ejecuta la predicción.</li>
+            <li>Se calculan las notas finales, créditos aprobados y cursos desaprobados de dicho ciclo.</li>
+            <li>Contabiliza si hubo asignaturas cursadas por segunda o tercera matrícula (<code>matriculas_repetidas_t1</code>).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="p-3 rounded border h-100 bg-light">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-secondary text-white px-2 py-1">Periodo t0</span>
+            <strong class="text-dark">Semestre Inmediatamente Anterior</strong>
+          </div>
+          <p class="small text-muted mb-2">
+            Es el semestre regular previo a t1. Permite al modelo estimar la tendencia y aceleración del rendimiento del estudiante.
+          </p>
+          <ul class="small text-secondary mb-0 ps-3">
+            <li>Compara la evolución del GPA (<code>gpa_t0</code> vs <code>gpa_t1</code>).</li>
+            <li>Evalúa si el estudiante incrementó o redujo su tasa de aprobación crediticia.</li>
+            <li>Verifica si hubo cursos retirados formalmente en dicho periodo (<code>retirados_t0</code>).</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sección 2: Glosario de las 20 Variables -->
+  <div class="card-clean p-4 mb-4">
+    <div class="form-section-title">
+      <i class="bi bi-card-list text-success"></i> 2. Glosario de las 20 Variables del Contrato de Inferencia
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-clean small align-middle mb-0">
+        <thead>
+          <tr>
+            <th style="width: 25%;">Variable</th>
+            <th style="width: 20%;">Nombre Técnico</th>
+            <th style="width: 15%;">Escala / Tipo</th>
+            <th>Descripción Operativa</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="fw-semibold">Cursos matriculados t0 / t1</td>
+            <td><code>cursos_t0</code>, <code>cursos_t1</code></td>
+            <td>Entero &ge; 0</td>
+            <td>Total de asignaturas oficiales inscritas por el alumno en cada semestre respectivo.</td>
+          </tr>
+          <tr>
+            <td class="fw-semibold">Cursos aprobados t0 / t1</td>
+            <td><code>aprobados_t0</code>, <code>aprobados_t1</code></td>
+            <td>Entero &ge; 0</td>
+            <td>Asignaturas cuya calificación final fue aprobatoria (&ge; 10.5 en escala vigesimal).</td>
+          </tr>
+          <tr>
+            <td class="fw-semibold">Cursos desaprobados t0 / t1</td>
+            <td><code>desaprobados_t0</code>, <code>desaprobados_t1</code></td>
+            <td>Entero &ge; 0</td>
+            <td>Asignaturas cuya nota final fue inferior a la nota mínima aprobatoria (&lt; 10.5).</td>
+          </tr>
+          <tr>
+            <td class="fw-semibold">Cursos retirados t0</td>
+            <td><code>retirados_t0</code></td>
+            <td>Entero &ge; 0</td>
+            <td>Cursos desmatriculados o retirados reglamentariamente durante el periodo t0.</td>
+          </tr>
+          <tr>
+            <td class="fw-semibold">Media simple t0 / t1</td>
+            <td><code>media_simple_t0</code>, <code>media_simple_t1</code></td>
+            <td>Real [0.0 - 20.0]</td>
+            <td>Promedio aritmético directo de las calificaciones finales obtenidas en cada semestre.</td>
+          </tr>
+          <tr>
+            <td class="fw-semibold">GPA semestral t0 / t1</td>
+            <td><code>gpa_t0</code>, <code>gpa_t1</code></td>
+            <td>Real [0.0 - 20.0]</td>
+            <td>Promedio ponderado por el creditaje de cada asignatura cursada en el semestre.</td>
+          </tr>
+          <tr>
+            <td class="fw-semibold">GPA acumulado t0 / t1</td>
+            <td><code>gpa_acumulado_t0</code>, <code>gpa_acumulado_t1</code></td>
+            <td>Real [0.0 - 20.0]</td>
+            <td>Promedio ponderado acumulado de toda la carrera hasta el cierre del semestre t0 y t1.</td>
+          </tr>
+          <tr>
+            <td class="fw-semibold">Créditos aprobados t0 / t1</td>
+            <td><code>creditos_aprobados_t0</code>, <code>creditos_aprobados_t1</code></td>
+            <td>Entero &ge; 0</td>
+            <td>Suma del peso en créditos de las asignaturas aprobadas en cada ciclo.</td>
+          </tr>
+          <tr>
+            <td class="fw-semibold">Créditos totales t0 / t1</td>
+            <td><code>creditos_totales_t0</code>, <code>creditos_totales_t1</code></td>
+            <td>Entero &ge; 0</td>
+            <td>Total de créditos correspondientes a las asignaturas inscritas.</td>
+          </tr>
+          <tr class="table-warning">
+            <td class="fw-semibold text-danger">Matrículas repetidas en t1</td>
+            <td><code>matriculas_repetidas_t1</code></td>
+            <td>Entero &ge; 0</td>
+            <td>Asignaturas matriculadas por segunda, tercera o posterior vez en el periodo de corte.</td>
+          </tr>
+          <tr>
+            <td class="fw-semibold">Desaprobaciones en historial</td>
+            <td><code>desaprobaciones_historial</code></td>
+            <td>Entero &ge; 0</td>
+            <td>Conteo acumulado de eventos de desaprobación desde el ingreso a la universidad.</td>
+          </tr>
+          <tr class="table-danger">
+            <td class="fw-semibold text-danger">Cursos pendientes al corte</td>
+            <td><code>n_cursos_pendientes_al_corte</code></td>
+            <td>Entero &ge; 1 (elegibles)</td>
+            <td>Asignaturas previamente reprobadas que a la fecha de corte no han sido aprobadas.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Sección 3: Criterios Éticos y Metodológicos -->
+  <div class="card-clean p-4">
+    <div class="form-section-title">
+      <i class="bi bi-shield-check text-success"></i> 3. Lineamientos Éticos y Académicos en la UNSM
+    </div>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <div class="p-3 rounded border bg-light h-100">
+          <h6 class="fw-bold text-dark mb-2"><i class="bi bi-heart-pulse text-danger me-1"></i> Finalidad Formativa</h6>
+          <p class="small text-muted mb-0">
+            AlertaU es un instrumento de apoyo y nivelación estudiantil. No constituye un diagnóstico irreversible 
+            ni debe emplearse de forma punitiva, sancionadora o excluyente para los alumnos de la UNSM.
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="p-3 rounded border bg-light h-100">
+          <h6 class="fw-bold text-dark mb-2"><i class="bi bi-lock text-success me-1"></i> Confidencialidad y Privacidad</h6>
+          <p class="small text-muted mb-0">
+            Los resultados y probabilidades son de uso restringido para tutores académicos, comisiones de tutoría 
+            y autoridades universitarias competentes en el marco de la mejora continua de la enseñanza.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

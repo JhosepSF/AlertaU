@@ -1,0 +1,214 @@
+{% extends 'alertau/base.html' %}
+{% load static %}
+
+{% block title %}Reportes Académicos - AlertaU | UNSM{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-3 px-lg-4 py-4">
+
+  <!-- Migajas de Pan -->
+  <nav aria-label="breadcrumb" class="mb-3 no-print">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{% url 'dashboard' %}" class="text-decoration-none text-success">Dashboard</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Reportes Institucionales</li>
+    </ol>
+  </nav>
+
+  <!-- Encabezado de Reportes -->
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 pb-2 border-bottom">
+    <div>
+      <h1 class="h3 fw-bold text-dark mb-1">Reporte Consolidado de Riesgo Académico</h1>
+      <p class="text-muted small mb-0">
+        Diagnóstico estadístico por periodo y distribución de vulnerabilidad según el modelo ST-LR en la UNSM.
+      </p>
+    </div>
+
+    <!-- Opciones de Exportación -->
+    <div class="d-flex align-items-center gap-2 mt-3 mt-md-0 no-print">
+      <a href="{% url 'exportar_csv' %}" class="btn btn-unsm-outline btn-sm">
+        <i class="bi bi-file-earmark-excel me-1"></i> Exportar CSV
+      </a>
+      <button onclick="window.print();" class="btn btn-unsm btn-sm">
+        <i class="bi bi-printer me-1"></i> Imprimir Reporte
+      </button>
+    </div>
+  </div>
+
+  <!-- Selector de Filtro por Periodo Académico (Requisito 7) -->
+  <div class="card-clean p-3 mb-4 bg-white no-print">
+    <form method="get" action="{% url 'reportes' %}" class="row g-3 align-items-center">
+      <div class="col-sm-auto">
+        <label for="select-periodo" class="col-form-label col-form-label-sm fw-semibold text-secondary">
+          <i class="bi bi-calendar3 me-1 text-success"></i> Seleccionar Periodo Académico:
+        </label>
+      </div>
+      <div class="col-sm-auto">
+        <select name="periodo" id="select-periodo" class="form-select form-select-sm" onchange="this.form.submit()">
+          <option value="TODOS" {% if periodo_seleccionado == 'TODOS' %}selected{% endif %}>Todos los periodos históricos</option>
+          {% for p in periodos %}
+            <option value="{{ p }}" {% if periodo_seleccionado == p %}selected{% endif %}>Periodo {{ p }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-sm-auto ms-auto text-muted small">
+        Periodo activo de visualización: <strong class="text-dark">{{ periodo_seleccionado }}</strong>
+      </div>
+    </form>
+  </div>
+
+  <!-- Resumen de Estudiantes Según Nivel de Riesgo (Requisito 7) -->
+  <div class="row g-3 mb-4">
+    
+    <div class="col-md-3">
+      <div class="stat-card stat-primary">
+        <div class="stat-value">{{ total }}</div>
+        <div class="stat-label">Total Evaluados en Periodo</div>
+        <div class="text-muted small mt-1">100% de la muestra</div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="stat-card stat-danger">
+        <div class="stat-value text-danger">{{ alto }}</div>
+        <div class="stat-label">Estudiantes Alto Riesgo</div>
+        <div class="text-danger small mt-1 fw-semibold">{{ pct_alto }}% de la cohorte</div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="stat-card stat-warning">
+        <div class="stat-value text-warning-emphasis">{{ moderado }}</div>
+        <div class="stat-label">Estudiantes Riesgo Moderado</div>
+        <div class="text-secondary small mt-1 fw-semibold">{{ pct_moderado }}% de la cohorte</div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="stat-card stat-success">
+        <div class="stat-value text-success">{{ bajo }}</div>
+        <div class="stat-label">Estudiantes Bajo Riesgo</div>
+        <div class="text-success small mt-1 fw-semibold">{{ pct_bajo }}% de la cohorte</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Análisis Gráfico de Distribución -->
+  <div class="card-clean p-4 mb-4">
+    <div class="card-header-clean px-0 pt-0 mb-3 d-flex justify-content-between align-items-center">
+      <span class="fw-bold text-dark"><i class="bi bi-bar-chart me-2 text-success"></i>Proporción Comparativa de Vulnerabilidad</span>
+      <span class="badge bg-light text-secondary border">Fórmula de Inferencia: ST-LR</span>
+    </div>
+
+    <div class="progress mb-4" style="height: 28px; border-radius: 6px;">
+      <div class="progress-bar bg-danger" role="progressbar" style="width: {{ pct_alto }}%;" aria-valuenow="{{ pct_alto }}" aria-valuemin="0" aria-valuemax="100">
+        Alto: {{ pct_alto }}%
+      </div>
+      <div class="progress-bar bg-warning text-dark" role="progressbar" style="width: {{ pct_moderado }}%;" aria-valuenow="{{ pct_moderado }}" aria-valuemin="0" aria-valuemax="100">
+        Moderado: {{ pct_moderado }}%
+      </div>
+      <div class="progress-bar bg-success" role="progressbar" style="width: {{ pct_bajo }}%;" aria-valuenow="{{ pct_bajo }}" aria-valuemin="0" aria-valuemax="100">
+        Bajo: {{ pct_bajo }}%
+      </div>
+    </div>
+
+    <div class="row g-3 small">
+      <div class="col-md-4">
+        <div class="p-3 rounded border" style="background-color: var(--risk-high-bg);">
+          <div class="fw-bold text-danger mb-1"><i class="bi bi-circle-fill text-danger me-1"></i> Grupo de Alto Riesgo</div>
+          <div class="text-secondary">
+            Estudiantes con probabilidad estimada &ge; 65%. Requieren citación obligatoria por la Dirección de Escuela y tutoría individualizada prioritaria.
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 rounded border" style="background-color: var(--risk-mod-bg);">
+          <div class="fw-bold text-warning-emphasis mb-1"><i class="bi bi-circle-fill text-warning me-1"></i> Grupo de Riesgo Moderado</div>
+          <div class="text-secondary">
+            Estudiantes con probabilidad entre 30% y 64.9%. Superan el umbral del estudio y ameritan seguimiento semestral y talleres de nivelación.
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="p-3 rounded border" style="background-color: var(--risk-low-bg);">
+          <div class="fw-bold text-success mb-1"><i class="bi bi-circle-fill text-success me-1"></i> Grupo de Bajo Riesgo</div>
+          <div class="text-secondary">
+            Estudiantes con probabilidad &lt; 30%. Trayectoria curricular regular y estable sin necesidad de intervención extraordinaria.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tabla de Estudiantes Comprendidos en el Reporte -->
+  <div class="card-clean mb-4">
+    <div class="card-header-clean d-flex justify-content-between align-items-center">
+      <span class="fw-bold text-dark">
+        <i class="bi bi-table me-2 text-success"></i>Detalle de Estudiantes en el Periodo Seleccionado
+      </span>
+      <span class="small text-muted">Mostrando hasta 15 casos representativos</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="table table-clean mb-0 align-middle">
+        <thead>
+          <tr>
+            <th>ID Estudiante</th>
+            <th>Nombre Referencial</th>
+            <th>Periodo</th>
+            <th>Nivel de Riesgo</th>
+            <th>Probabilidad</th>
+            <th>Cursos Pendientes</th>
+            <th>Repetidas t1</th>
+            <th>GPA t1</th>
+            <th class="text-end">Acción</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for m in muestras %}
+            <tr>
+              <td><code>{{ m.codigo_estudiante }}</code></td>
+              <td>{{ m.nombre_referencial|default:"Confidencial" }}</td>
+              <td><span class="badge bg-light text-secondary border">{{ m.periodo_corte }}</span></td>
+              <td>
+                <span class="risk-badge {{ m.badge_class_custom }}">
+                  {{ m.get_nivel_riesgo_display }}
+                </span>
+              </td>
+              <td class="fw-bold">{{ m.probabilidad_porcentaje }}%</td>
+              <td>{{ m.n_cursos_pendientes_al_corte|floatformat:0 }}</td>
+              <td>{{ m.matriculas_repetidas_t1|floatformat:0 }}</td>
+              <td>{{ m.gpa_t1|floatformat:2 }}</td>
+              <td class="text-end">
+                <a href="{% url 'resultado_prediccion' m.pk %}" class="btn btn-light btn-sm border" title="Ver ficha">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="9" class="text-center py-4 text-muted">
+                No hay datos para el periodo seleccionado.
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- Firma y Pie Institucional para Impresión -->
+  <div class="p-4 bg-light rounded border mt-4 text-center">
+    <div class="d-inline-flex align-items-center gap-2 mb-2">
+      <span class="unsm-logo-placeholder">Logo UNSM</span>
+      <span class="fw-bold text-dark">Universidad Nacional de San Martín</span>
+    </div>
+    <div class="text-muted small">
+      Reporte emitido automáticamente por el Sistema AlertaU &bull; Dirección de Asuntos Académicos
+    </div>
+  </div>
+
+</div>
+{% endblock %}

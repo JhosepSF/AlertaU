@@ -1,0 +1,25 @@
+{
+  "C": 10.0,
+  "threshold_pseudo": 0.95,
+  "threshold_decision": 0.3,
+  "seleccion_modelo": "máxima AP validación; desempates ROC-AUC/F1",
+  "seleccion_umbral": "máximo F1 validación; desempates balanced accuracy/distancia 0.5",
+  "metrics_validation": {
+    "n": 94,
+    "positivos": 44,
+    "negativos": 50,
+    "pr_auc_AP": 0.8286208398833395,
+    "roc_auc": 0.8345454545454545,
+    "f1": 0.7835051546391752,
+    "precision": 0.7169811320754716,
+    "recall": 0.8636363636363636,
+    "balanced_accuracy": 0.7818181818181817,
+    "accuracy": 0.776595744680851,
+    "brier": 0.16762080591033549,
+    "umbral_decision": 0.3,
+    "TN": 35,
+    "FP": 15,
+    "FN": 6,
+    "TP": 38
+  }
+}
